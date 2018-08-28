@@ -3,8 +3,8 @@ package main
 import (
 	"time"
 	"fmt"
-	"github.com/elycruz/go-programming-lang-book/chp12/format"
-	"github.com/elycruz/go-programming-lang-book/chp12/display"
+	"github.com/elycruz/the-go-prog-lang-book/chp12/format"
+	"github.com/elycruz/the-go-prog-lang-book/chp12/display"
 	"os"
 	"reflect"
 )

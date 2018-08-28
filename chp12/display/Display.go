@@ -3,7 +3,7 @@ package display
 import (
 	"fmt"
 	"reflect"
-	"github.com/elycruz/go-programming-lang-book/chp12/format"
+	"github.com/elycruz/the-go-prog-lang-book/chp12/format"
 )
 
 func Display (name string, x interface{}, maxDepth int) {
