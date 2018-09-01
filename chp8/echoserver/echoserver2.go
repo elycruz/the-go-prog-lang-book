@@ -34,11 +34,11 @@ func main () {
 			continue
 		}
 		fmt.Println("Received a connection.")
-		go handleConn(conn) // Handle one connection at a time
+		go handleConn2(conn) // Handle one connection at a time
 	}
 }
 
-func echo (c net.Conn, shout string, delay time.Duration) {
+func echo2(c net.Conn, shout string, delay time.Duration) {
 	fmt.Fprintln(c, "\t", strings.ToUpper(shout))
 	time.Sleep(delay)
 	fmt.Fprintln(c, "\t", shout)
@@ -46,16 +46,16 @@ func echo (c net.Conn, shout string, delay time.Duration) {
 	fmt.Fprintln(c, "\t", strings.ToLower(shout))
 }
 
-func pipeReaderToWriter(incoming io.Reader, outgoing io.Writer)  {
+func pipeReaderToWriter2(incoming io.Reader, outgoing io.Writer)  {
 	if _, err := io.Copy(outgoing, incoming); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func handleConn(c net.Conn) {
+func handleConn2(c net.Conn) {
 	input := bufio.NewScanner(c)
 	for input.Scan() {
-		echo(c, input.Text(), 1*time.Second)
+		go echo2(c, input.Text(), 1*time.Second)
 	}
 	// Ignoring potential errors
 	c.Close()
