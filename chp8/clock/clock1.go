@@ -1,4 +1,4 @@
-package main
+package clock
 
 // Sequential clock server
 
