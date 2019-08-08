@@ -1,4 +1,4 @@
-package clock
+package main
 
 import (
 	"flag"

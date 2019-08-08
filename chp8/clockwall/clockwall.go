@@ -1,4 +1,4 @@
-package clockwall
+package main
 
 import (
 	"io"
@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"strings"
+	"time"
 )
 
 /**
@@ -13,7 +14,7 @@ import (
  * @todo requires channels for it to work properly
  */
 
-func main ()  {
+func main() {
 	if len(os.Args) <= 1 {
 		log.Print("Expected a list of locations.  Got none.")
 		return
@@ -28,21 +29,29 @@ func main ()  {
 		}
 		go makeNetCatConn(location)
 	}
+
+	time.Sleep(time.Hour * 24)
 }
 
-func isValidLocation (location string) bool {
+func isValidLocation(location string) bool {
 	return len(location) > 0
 }
 
-func makeNetCatConn (location string) {
+func makeNetCatConn(location string) {
 	conn, err := net.Dial("tcp", location)
-	if err != nil { log.Fatal(err) }
+	if err != nil {
+		log.Fatal("An error occurred.  ", err)
+	}
 	log.Printf("Dialing \"%s\"...", location)
-	defer conn.Close()
 	pipeReaderToWriter(conn, os.Stdout)
+	defer func() {
+		if err := conn.Close(); err != nil {
+			log.Fatal(err)
+		}
+	}()
 }
 
-func pipeReaderToWriter(incoming io.Reader, outgoing io.Writer)  {
+func pipeReaderToWriter(incoming io.Reader, outgoing io.Writer) {
 	if _, err := io.Copy(outgoing, incoming); err != nil {
 		log.Fatal(err)
 	}
