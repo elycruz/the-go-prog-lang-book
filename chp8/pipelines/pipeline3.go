@@ -5,9 +5,31 @@ import (
 	"fmt"
 )
 
-func main () {
+func counter(limit int, out chan<- int) {
+	for x := 0; x <= limit; x++ {
+		out <- x
+	}
+	close(out)
+}
+
+func squarer(incoming <-chan int, out chan<- int) {
+	for x := range incoming {
+		out <- x * x
+	}
+	close(out)
+}
+
+func printer(incoming <-chan int) {
+	for x := range incoming {
+		fmt.Println(x)
+	}
+}
+
+func main() {
 	limit := flag.Int("l", -1, "Squares limit")
+
 	flag.Parse()
+
 	if *limit <= 0 {
 		fmt.Printf("Only positive limits allowed.  %d was given.\n", limit)
 		return
@@ -16,23 +38,9 @@ func main () {
 	naturals := make(chan int)
 	squares := make(chan int)
 
-	// Counter
-	go func () {
-		for x := 0 ; x <= *limit; x++ {
-			naturals <- x
-		}
-		close(naturals)
-	}()
+	go counter(100, naturals)
 
-	// ETL
-	go func () {
-		for x := range naturals {
-			squares <- x * x
-		}
-		close(squares)
-	}()
+	go squarer(naturals, squares)
 
-	for x := range squares {
-		fmt.Println(x)
-	}
+	printer(squares)
 }
