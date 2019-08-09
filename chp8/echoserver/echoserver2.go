@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"net"
 	"strconv"
 	"strings"
@@ -18,6 +19,7 @@ import (
 
 func main () {
 	port := flag.Uint64("p", 8000, "Port number")
+	interval := flag.Int("d", 1000, "Echo interval")
 
 	flag.Parse()
 
@@ -26,15 +28,17 @@ func main () {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Listening on port:%d", *port)
 	for {
+		fmt.Printf("Listening on port:%d", *port)
 		conn, err := listener.Accept()
 		if err != nil {
 			log.Print(err) // E.g., connection aborted continue
 			continue
 		}
-		fmt.Println("Received a connection.")
-		go handleConn2(conn) // Handle one connection at a time
+		fmt.Println("\nReceived a connection.")
+
+		// Handle one connection at a time
+		go handleConn2(conn, time.Duration(math.Abs(float64(*interval / 1000))))
 	}
 }
 
@@ -52,11 +56,16 @@ func pipeReaderToWriter2(incoming io.Reader, outgoing io.Writer)  {
 	}
 }
 
-func handleConn2(c net.Conn) {
+func handleConn2(c net.Conn, delay time.Duration) {
 	input := bufio.NewScanner(c)
 	for input.Scan() {
-		go echo2(c, input.Text(), 1*time.Second)
+		go echo2(c, input.Text(), delay * time.Second)
 	}
-	// Ignoring potential errors
-	c.Close()
+
+	defer func() {
+		if err := c.Close(); err != nil {
+			log.Fatal(err)
+		}
+		log.Println("\nConnection closed")
+	}()
 }
